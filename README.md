@@ -8,7 +8,7 @@
 
 ## Description
 
-**host-local** uses the POSIX bultin name resolver to make forward ((getaddrinfo)[https://linux.die.net/man/3/getaddrinfo]) and reverse ((getnameinfo)[https://linux.die.net/man/3/getnameinfo]) queries.
+**host-local** uses the POSIX bultin name resolver to make forward ([getaddrinfo](https://linux.die.net/man/3/getaddrinfo)) and reverse ([getnameinfo](https://linux.die.net/man/3/getnameinfo)) queries.
 
 ## Options
 
