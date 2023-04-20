@@ -20,6 +20,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -35,19 +36,52 @@ const char* proto_desc( int protocol ) {
 }
 
 int main( int argc, char** argv ) {
-	if ( argc != 2 && argc != 3 ) {
-		fprintf( stderr, "Usage: %s host-or-address [service]\n", argv[0] );
-		exit( 2 );
-	}
+	int help = 0;
 
-	const char* in_host = argv[1];
-	const char* in_serv = ( argc >= 3 ? argv[2] : NULL );
-
+	/* Prepare options right away so that they can be directly changed when parsing the command line */
 	struct addrinfo hints;
 	memset( &hints, '\0', sizeof( hints ) );
 
 	hints.ai_family = AF_UNSPEC;     /* Allow IPv4 or IPv6 */
 	hints.ai_flags = AI_CANONNAME;   /* Include canonical name */
+
+	/* Parse command line */
+	/* ------------------ */
+
+	while ( 1 ) {
+		int opt = getopt( argc, argv, "h46tu" );
+		if ( opt < 0 ) break;
+		if ( opt == '?' ) exit( 2 );
+		if ( opt == 'h' ) help++;
+		if ( opt == '4' ) hints.ai_family = AF_INET;
+		if ( opt == '6' ) hints.ai_family = AF_INET6;
+		if ( opt == 't' ) hints.ai_socktype = SOCK_STREAM;
+		if ( opt == 'u' ) hints.ai_socktype = SOCK_DGRAM;
+	}
+
+	if ( help || ( argc - optind != 1 && argc - optind != 2 ) ) {
+		fprintf( stderr, "Usage: %s [options] host-or-address [service]\n", argv[0] );
+
+		if ( help ) {
+			fprintf( stderr, "\n" );
+			fprintf( stderr, "Options:\n" );
+			fprintf( stderr, "-h  Display this help message\n" );
+			fprintf( stderr, "-4  Query only IPv4 addresses\n" );
+			fprintf( stderr, "-6  Query only IPv6 addresses\n" );
+			fprintf( stderr, "-t  Query only TCP serivces\n" );
+			fprintf( stderr, "-u  Query only UDP services\n" );
+
+			exit( EXIT_SUCCESS );
+		} else {
+			exit( 2 );
+		}
+	}
+
+	const char* in_host = argv[optind];
+	const char* in_serv = ( argc - optind >= 2 ? argv[optind + 1] : NULL );
+
+	/* Perform forward query */
+	/* --------------------- */
 
 	struct addrinfo* res;
 	int ret = getaddrinfo( in_host, in_serv, &hints, &res );
