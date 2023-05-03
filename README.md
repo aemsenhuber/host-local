@@ -15,6 +15,8 @@
 <dl>
 <dt>-h</dt>
 <dd>Display the help message and exit.</dd>
+<dt>-v</dt>
+<dd>Display version information and exit.</dd>
 <dt>-4</dt>
 <dd>Query only IPv4 addresses.</dd>
 <dt>-6</dt>

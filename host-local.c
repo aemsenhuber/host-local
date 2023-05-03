@@ -16,6 +16,10 @@
  * limitations under the License.
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -37,6 +41,7 @@ const char* proto_desc( int protocol ) {
 
 int main( int argc, char** argv ) {
 	int help = 0;
+	int version = 0;
 
 	/* Prepare options right away so that they can be directly changed when parsing the command line */
 	struct addrinfo hints;
@@ -49,27 +54,43 @@ int main( int argc, char** argv ) {
 	/* ------------------ */
 
 	while ( 1 ) {
-		int opt = getopt( argc, argv, "h46tu" );
+		int opt = getopt( argc, argv, "hv46tu" );
 		if ( opt < 0 ) break;
 		if ( opt == '?' ) exit( 2 );
 		if ( opt == 'h' ) help++;
+		if ( opt == 'v' ) version++;
 		if ( opt == '4' ) hints.ai_family = AF_INET;
 		if ( opt == '6' ) hints.ai_family = AF_INET6;
 		if ( opt == 't' ) hints.ai_socktype = SOCK_STREAM;
 		if ( opt == 'u' ) hints.ai_socktype = SOCK_DGRAM;
 	}
 
+	if ( version ) {
+#ifdef PACKAGE_STRING
+		fputs( PACKAGE_STRING "\n", stderr );
+#endif
+#ifdef PACKAGE_URL
+		fputs( PACKAGE_URL "\n", stderr );
+#endif
+		fputs( "\n", stderr );
+		fputs( "Copyright 2023 Alexandre Emsenhuber\n", stderr );
+		fputs( "Licensed under the Apache License, Version 2.0\n", stderr );
+
+		exit( EXIT_SUCCESS );
+	}
+
 	if ( help || ( argc - optind != 1 && argc - optind != 2 ) ) {
 		fprintf( stderr, "Usage: %s [options] host-or-address [service]\n", argv[0] );
 
 		if ( help ) {
-			fprintf( stderr, "\n" );
-			fprintf( stderr, "Options:\n" );
-			fprintf( stderr, "-h  Display this help message\n" );
-			fprintf( stderr, "-4  Query only IPv4 addresses\n" );
-			fprintf( stderr, "-6  Query only IPv6 addresses\n" );
-			fprintf( stderr, "-t  Query only TCP serivces\n" );
-			fprintf( stderr, "-u  Query only UDP services\n" );
+			fputs( "\n", stderr );
+			fputs( "Options:\n", stderr );
+			fputs( "-h  Display this help message and exit\n", stderr );
+			fputs( "-v  Display version information and exit\n", stderr );
+			fputs( "-4  Query only IPv4 addresses\n", stderr );
+			fputs( "-6  Query only IPv6 addresses\n", stderr );
+			fputs( "-t  Query only TCP serivces\n", stderr );
+			fputs( "-u  Query only UDP services\n", stderr );
 
 			exit( EXIT_SUCCESS );
 		} else {
