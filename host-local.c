@@ -91,7 +91,7 @@ int main( int argc, char** argv ) {
 	}
 
 	/* With AI_CANONNAME flag, only the first result has the "ai_canonname" field set. */
-	if ( res->ai_canonname != NULL ) {
+	if ( res->ai_canonname != NULL && strcasecmp( res->ai_canonname, in_host ) ) {
 		printf( "Canonical name %s\n", res->ai_canonname );
 	}
 
